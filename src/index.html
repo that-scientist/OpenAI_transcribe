@@ -4,15 +4,18 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-        <title>Transcribe</title>
+        <title>Transcribe - OpenAI Whisper API</title>
         <link rel="stylesheet" href="style.css" type="text/css">
         <script src="index.js"></script>
     </head>
     <body>
         <div class="container">
+            <h1>Transcribe Audio</h1>
+            <p>Using OpenAI's Whisper API (whisper-1 model)</p>
+            
             OpenAI API key:
             <input type="text" id="api-key" placeholder="sk-xxxx">
-            <div class="disclaimer">The API key is only sent to Open AI directly. It is saved to your browser's localStorage.</div>
+            <div class="disclaimer">The API key is only sent to OpenAI directly. It is saved to your browser's localStorage.</div>
             <div id="start-view">
                 Start by <a href="https://platform.openai.com/account/api-keys" target="_blank">getting an API key</a> from OpenAI.
                 <div class="disclaimer">OpenAI documentation says "Do not share your API key with others, or expose it in the browser or other client-side code." This means that if you are <strong>building</strong> a web app, you should not leak the service's API key to your users.</div>
@@ -88,6 +91,7 @@
                 <br>
                 <label for="audio-file" class="button">Choose an audio file</label>
                 <input type="file" accept="audio/mp3, audio/mp4, audio/mpeg, audio/mpga, audio/m4a, audio/wav, audio/webm, video/mp4, video/mpeg, video/webm" id="audio-file" name="file" style="visibility:hidden;">
+                <div class="disclaimer">Supported formats: mp3, mp4, mpeg, mpga, m4a, wav, webm. Maximum file size: 25MB.</div>
               </form>
             <div id="output"></div>
             <footer>
@@ -96,6 +100,8 @@
                 <a href="https://github.com/felixbade/transcribe" target="_blank">Source code</a>
                 &middot;
                 <a href="https://github.com/felixbade/transcribe/issues" target="_blank">Feature request</a>
+                &middot;
+                <a href="https://platform.openai.com/docs/guides/speech-to-text" target="_blank">API Documentation</a>
             </footer>
         </div>
     </body>
