@@ -153,6 +153,33 @@ select:focus {
     margin: 1em 0;
 }
 
+.error {
+    background-color: hsl(5, 70%, 95%);
+    color: var(--error-fg);
+    padding: 1em;
+    border-radius: 0.5em;
+    border: 1px solid var(--error-fg);
+    margin: 1em 0;
+}
+
+.transcribing {
+    background-color: var(--info);
+    color: var(--info-link);
+    padding: 1em;
+    border-radius: 0.5em;
+    text-align: center;
+    margin: 1em 0;
+}
+
+.file-info {
+    background-color: var(--response-bg);
+    color: var(--fg);
+    padding: 1em;
+    border-radius: 0.5em;
+    margin: 1em 0;
+    border-left: 4px solid var(--my-message-bg);
+}
+
 
 @media (prefers-color-scheme: dark) {
     :root {

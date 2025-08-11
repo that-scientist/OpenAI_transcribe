@@ -1,6 +1,6 @@
 const url = 'https://api.openai.com/v1/audio/transcriptions'
 
-const transcribe = (apiKey, file, language, response_format) => {
+const transcribe = async (apiKey, file, language, response_format) => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('model', 'whisper-1')
@@ -12,19 +12,28 @@ const transcribe = (apiKey, file, language, response_format) => {
     const headers = new Headers()
     headers.append('Authorization', `Bearer ${apiKey}`)
 
-    return fetch(url, {
-        method: 'POST',
-        body: formData,
-        headers: headers
-    }).then(response => {
-        console.log(response)
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: headers
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(`API Error: ${response.status} ${response.statusText}${errorData.error?.message ? ` - ${errorData.error.message}` : ''}`)
+        }
+
         // Automatically handle response format
         if (response_format === 'json' || response_format === 'verbose_json') {
-            return response.json()
+            return await response.json()
         } else {
-            return response.text()
+            return await response.text()
         }
-    }).catch(error => console.error(error))
+    } catch (error) {
+        console.error('Transcription error:', error)
+        throw error
+    }
 }
 
 
@@ -72,10 +81,24 @@ const updateTextareaSize = (element) => {
 let outputElement
 
 const setTranscribingMessage = (text) => {
-    outputElement.innerHTML = text
+    outputElement.innerHTML = `<div class="transcribing">${text}</div>`
+}
+
+const setError = (error) => {
+    outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>`
+}
+
+const showFileInfo = (file) => {
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2)
+    outputElement.innerHTML = `<div class="file-info">Selected: ${file.name} (${sizeMB} MB)</div>`
 }
 
 const setTranscribedPlainText = (text) => {
+    // Handle both string and object responses
+    if (typeof text === 'object' && text.text) {
+        text = text.text
+    }
+    
     // outputElement.innerText creates unnecessary <br> elements
     text = text.replaceAll('&', '&amp;')
     text = text.replaceAll('<', '&lt;')
@@ -98,24 +121,52 @@ window.addEventListener('load', () => {
     outputElement = document.querySelector('#output')
 
     const fileInput = document.querySelector('#audio-file')
-    fileInput.addEventListener('change', () => {
+    fileInput.addEventListener('change', async () => {
+        const apiKey = localStorage.getItem('api-key')
+        
+        if (!apiKey) {
+            setError(new Error('Please enter your OpenAI API key'))
+            return
+        }
+
+        const file = fileInput.files[0]
+        if (!file) {
+            setError(new Error('Please select an audio file'))
+            return
+        }
+
+        // Show file info first
+        showFileInfo(file)
+
+        // Validate file size (25MB limit for Whisper API)
+        const maxSize = 25 * 1024 * 1024 // 25MB
+        if (file.size > maxSize) {
+            setError(new Error('File size exceeds 25MB limit. Please choose a smaller file.'))
+            return
+        }
+
         setTranscribingMessage('Transcribing...')
 
-        const apiKey = localStorage.getItem('api-key')
-        const file = fileInput.files[0]
-        const language = document.querySelector('#language').value
-        const response_format = document.querySelector('#response_format').value
-        const response = transcribe(apiKey, file, language, response_format)
+        try {
+            const language = document.querySelector('#language').value
+            const response_format = document.querySelector('#response_format').value
+            const transcription = await transcribe(apiKey, file, language, response_format)
 
-        response.then(transcription => {
             if (response_format === 'verbose_json') {
-                setTranscribedSegments(transcription.segments)
+                if (transcription.segments && Array.isArray(transcription.segments)) {
+                    setTranscribedSegments(transcription.segments)
+                } else {
+                    setTranscribedPlainText(transcription.text || JSON.stringify(transcription))
+                }
             } else {
                 setTranscribedPlainText(transcription)
             }
 
             // Allow multiple uploads without refreshing the page
             fileInput.value = null
-        })
+        } catch (error) {
+            setError(error)
+            fileInput.value = null
+        }
     })
 })
