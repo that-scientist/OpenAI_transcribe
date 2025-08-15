@@ -12,9 +12,9 @@
         <div class="container">
             OpenAI API key:
             <input type="text" id="api-key" placeholder="sk-xxxx">
-            <div class="disclaimer">The API key is only sent to Open AI directly. It is saved to your browser's localStorage.</div>
+            <div class="disclaimer">The API key is only sent to OpenAI directly. It is saved to your browser's localStorage.</div>
             <div id="start-view">
-                Start by <a href="https://platform.openai.com/account/api-keys" target="_blank">getting an API key</a> from OpenAI.
+                Start by <a href="https://platform.openai.com/api-keys" target="_blank">getting an API key</a> from OpenAI.
                 <div class="disclaimer">OpenAI documentation says "Do not share your API key with others, or expose it in the browser or other client-side code." This means that if you are <strong>building</strong> a web app, you should not leak the service's API key to your users.</div>
             </div>
             <form id="upload-form">
@@ -84,14 +84,25 @@
                     <option value="verbose_json" selected>Normal text</option>
                     <option value="srt">SRT</option>
                     <option value="vtt">VTT</option>
-                </select><br />
+                </select>
+                <br />
+                <select id="model" name="model">
+                    <option value="gpt-4o-mini-transcribe" selected>gpt-4o-mini-transcribe (current)</option>
+                    <option value="whisper-1">whisper-1 (legacy)</option>
+                </select>
+                <br />
+                <select id="mode" name="mode">
+                    <option value="immediate" selected>Immediate</option>
+                    <option value="batch">Batch (up to 24h, cheaper)</option>
+                </select>
+                <div id="notice" class="disclaimer"></div>
                 <br>
                 <label for="audio-file" class="button">Choose an audio file</label>
                 <input type="file" accept="audio/mp3, audio/mp4, audio/mpeg, audio/mpga, audio/m4a, audio/wav, audio/webm, video/mp4, video/mpeg, video/webm" id="audio-file" name="file" style="visibility:hidden;">
               </form>
             <div id="output"></div>
             <footer>
-                <a href="https://platform.openai.com/account/usage" target="_blank">Your usage</a>
+                <a href="https://platform.openai.com/usage" target="_blank">Your usage</a>
                 &middot;
                 <a href="https://github.com/felixbade/transcribe" target="_blank">Source code</a>
                 &middot;
